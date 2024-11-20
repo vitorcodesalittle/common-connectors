@@ -1,5 +1,5 @@
 services:
-  db:
+  pgdb:
     image: postgres:16
     ports:
       - "5432:5432"
@@ -10,3 +10,21 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+  oracledb:
+    image: container-registry.oracle.com/database/express:21.3.0-xe
+    container_name: oracle-db
+    environment:
+      ORACLE_PASSWORD: oracle # Default password for SYS, SYSTEM, and PDBADMIN users
+      APP_USER: appuser       # Optional application user
+      APP_USER_PASSWORD: apppassword # Password for application user
+    ports:
+      - 1521:1521             # Oracle's default port
+      - 5500:5500             # EM Express port
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'SELECT 1 FROM DUAL;' | sqlplus -s system/oracle@localhost:1521/XEPDB1 || exit 1"]
+      interval: 10s
+      retries: 5
+    volumes:
+      - source: "./Oracle-AdventureWorks"
+        target: "/home/oracle"
+        type: "bind"

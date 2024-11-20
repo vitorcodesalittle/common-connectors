@@ -4,28 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c59c1297-bce5-4d8a-8052-db9e26b063aa" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/prepare-test.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/SinkConnector.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/SinkConnectorResult.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/SourceConnectionResult.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/SourceConnector.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/impl/PgSinkConnector.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/readers/AWSFileReader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/writers/AWSCredentials.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/writers/AWSFileWriter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/writers/CSVLineWriter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/log4j.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/integration/TestConnector.java" afterDir="false" />
+    <list default="true" id="c59c1297-bce5-4d8a-8052-db9e26b063aa" name="Changes" comment="fix: handle null strings hard coding as &quot;NULL&quot;">
+      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/exceptions/NotImplementedException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/impl/BaseSinkConnector.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/impl/BaseSourceConnector.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/impl/OracleSourceConnector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Oracle-AdventureWorks/AdvWorks_Create_User_Script.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Oracle-AdventureWorks/AdvWorks_Create_User_Script.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/impl/PgSourceConnector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/impl/PgSourceConnector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/readers/AWSFileReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/readers/AWSFileReader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/writers/AWSCredentials.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/writers/AWSCredentials.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/writers/AWSFileWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/writers/AWSFileWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/writers/CSVLineWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/writers/CSVLineWriter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,11 +55,11 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "Application.Main.executor": "Run",
+    "Application.Main.executor": "Debug",
     "Application.Unnamed.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "develop",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -111,25 +105,44 @@
       <updated>1732068894007</updated>
       <workItem from="1732068895134" duration="1033000" />
       <workItem from="1732071061904" duration="3322000" />
-      <workItem from="1732108917552" duration="16296000" />
+      <workItem from="1732108917552" duration="23755000" />
     </task>
+    <task id="LOCAL-00001" summary="fix: handle null strings hard coding as &quot;NULL&quot;">
+      <option name="closed" value="true" />
+      <created>1732126355114</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1732126355114</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat: add postgres to postgres through aws connector" />
+    <MESSAGE value="fix: handle null strings hard coding as &quot;NULL&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: handle null strings hard coding as &quot;NULL&quot;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/Main.java</url>
-          <line>25</line>
-          <option name="timeStamp" value="1" />
+          <line>186</line>
+          <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/connector/impl/PgSourceConnector.java</url>
-          <line>70</line>
-          <option name="timeStamp" value="10" />
+          <url>file://$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/Main.java</url>
+          <line>227</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/br/com/vilmasoftware/Main.java</url>
+          <line>200</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

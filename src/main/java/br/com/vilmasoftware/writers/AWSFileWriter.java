@@ -1,4 +1,4 @@
-package br.com.vilmasoftware.connector.writers;
+package br.com.vilmasoftware.writers;
 
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -7,12 +7,8 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
-import java.io.Reader;
 
 @RequiredArgsConstructor
 public class AWSFileWriter {

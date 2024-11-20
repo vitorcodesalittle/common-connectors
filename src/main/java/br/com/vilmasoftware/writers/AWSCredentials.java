@@ -1,4 +1,4 @@
-package br.com.vilmasoftware.connector.writers;
+package br.com.vilmasoftware.writers;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
