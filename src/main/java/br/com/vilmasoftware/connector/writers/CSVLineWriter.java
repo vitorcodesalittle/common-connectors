@@ -8,6 +8,7 @@ public class CSVLineWriter {
     private final String rowDelimiter;
 
     private final Writer writer;
+    private final String nullString = "NULL";
 
     public CSVLineWriter(String delimiter, Writer writer) {
         this.delimiter = delimiter;
@@ -28,7 +29,7 @@ public class CSVLineWriter {
     }
     private String parse(Object object) {
         if (object == null) {
-            return null;
+            return nullString;
         }
         if (object instanceof String) {
             return "\"%s\"".formatted(object);
