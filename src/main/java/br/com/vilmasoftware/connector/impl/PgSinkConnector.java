@@ -1,7 +1,6 @@
 package br.com.vilmasoftware.connector.impl;
 
 import br.com.vilmasoftware.connector.SinkConnector;
-import br.com.vilmasoftware.connector.SinkConnectorResult;
 import lombok.RequiredArgsConstructor;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;

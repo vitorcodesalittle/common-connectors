@@ -4,9 +4,8 @@ import br.com.vilmasoftware.connector.SinkConnector;
 import br.com.vilmasoftware.connector.SourceConnectionResult;
 import br.com.vilmasoftware.connector.SourceConnector;
 import br.com.vilmasoftware.connector.exceptions.NotImplementedException;
-import br.com.vilmasoftware.connector.impl.OracleSourceConnector;
 import br.com.vilmasoftware.connector.impl.PgSinkConnector;
-import br.com.vilmasoftware.connector.impl.PgSourceConnector;
+import br.com.vilmasoftware.connector.impl.SourceConnectorImpl;
 import br.com.vilmasoftware.readers.AWSFileReader;
 import br.com.vilmasoftware.writers.AWSCredentials;
 import br.com.vilmasoftware.writers.AWSFileWriter;
@@ -29,7 +28,6 @@ import java.util.Optional;
 
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
-
     public static void main(String[] args) {
         runSourceConnectorExample(args);
     }
@@ -118,10 +116,7 @@ public class Main {
                     switch (DataSourceSupportedProviders.byJdbcId(parts[1])
                             .orElseThrow(() -> notImplemented)) {
                         case POSTGRES -> {
-                            PGSimpleDataSource postgresDataSource = new PGSimpleDataSource();
-                            postgresDataSource.setURL(dataSourceUrl);
-                            postgresDataSource.setUser(user);
-                            postgresDataSource.setPassword(password);
+                            PGSimpleDataSource postgresDataSource = getPostgresDataSource(dataSourceUrl, user, password);
                             dataSource = postgresDataSource;
                             return new PgSinkConnector(dataSource);
                         }
@@ -153,15 +148,12 @@ public class Main {
                     switch (DataSourceSupportedProviders.byJdbcId(parts[0])
                             .orElseThrow(() -> notImplemented)) {
                         case POSTGRES -> {
-                            PGSimpleDataSource postgresDataSource = new PGSimpleDataSource();
-                            postgresDataSource.setURL(dataSourceUrl);
-                            postgresDataSource.setUser(user);
-                            postgresDataSource.setPassword(password);
-                            return new PgSourceConnector(postgresDataSource);
+                            var dataSource = getPostgresDataSource(dataSourceUrl, user, password);
+                            return new SourceConnectorImpl(dataSource);
                         }
                         case ORACLE -> {
                             var dataSource = createOracleDataSource(dataSourceUrl, user, password);
-                            return new OracleSourceConnector(dataSource);
+                            return new SourceConnectorImpl(dataSource);
                         }
                     }
 
@@ -171,6 +163,14 @@ public class Main {
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Invalid datasource URL", e);
         }
+    }
+
+    private static PGSimpleDataSource getPostgresDataSource(String dataSourceUrl, String user, String password) {
+        PGSimpleDataSource postgresDataSource = new PGSimpleDataSource();
+        postgresDataSource.setURL(dataSourceUrl);
+        postgresDataSource.setUser(user);
+        postgresDataSource.setPassword(password);
+        return postgresDataSource;
     }
 
     public static DataSource createOracleDataSource(String url, String user, String password) throws SQLException {
