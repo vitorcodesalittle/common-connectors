@@ -14,6 +14,8 @@ public class SinkConnectorBuilder {
     private String dataSourceUrl;
     private String user;
     private String password;
+    private String awsRegion;
+    private String awsBucket;
 
     public SinkConnectorBuilder dataSourceUrl(String value) {
         this.dataSourceUrl = value;
@@ -27,6 +29,14 @@ public class SinkConnectorBuilder {
 
     public SinkConnectorBuilder password(String value) {
         password = value;
+        return this;
+    }
+    public SinkConnectorBuilder awsRegion(String value) {
+        awsRegion = value;
+        return this;
+    }
+    public SinkConnectorBuilder awsBucket(String value) {
+        awsBucket = value;
         return this;
     }
 
@@ -48,7 +58,7 @@ public class SinkConnectorBuilder {
                             .orElseThrow(() -> notImplemented)) {
                         case POSTGRES -> {
                             dataSource = DataSourceFactory.createPostgresDataSource(dataSourceUrl, user, password);
-                            return new PgSinkConnector(dataSource);
+                            return new PgSinkConnector(dataSource, awsBucket, awsRegion);
                         }
                         case ORACLE -> {
                             throw notImplemented;

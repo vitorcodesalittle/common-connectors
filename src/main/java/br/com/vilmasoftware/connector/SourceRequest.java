@@ -13,7 +13,7 @@ import lombok.Getter;
 
 @Getter
 public class SourceRequest {
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private String tableName;
     private String schemaName;
     private String query;

@@ -2,24 +2,14 @@ package br.com.vilmasoftware;
 
 import br.com.vilmasoftware.connector.*;
 import br.com.vilmasoftware.connector.exceptions.NotImplementedException;
-import br.com.vilmasoftware.readers.AWSFileReader;
 import lombok.SneakyThrows;
 
 import org.apache.commons.cli.*;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.stream.Stream;
 
 public class Main {
-	private static ObjectMapper objectMapper = new ObjectMapper();
-
 	public static void main(String[] args) {
 		try {
 			CommandLine cli = getCli(args);
@@ -55,11 +45,7 @@ public class Main {
 					.user(cli.getOptionValue("user")).password(cli.getOptionValue("password")).build();
 			final String schema = cli.getOptionValue("schemaName");
 			for (String tableName : cli.getOptionValue("tableNames").split(",")) {
-				// Upload to s3
-				AWSFileReader awsFileWriter = new AWSFileReader(cli.getOptionValue("awsS3Bucket"),
-						cli.getOptionValue("awsRegion"));
-				File csvfile = awsFileWriter.read("%s.csv".formatted(tableName));
-				sinkConnector.write(schema, tableName, csvfile);
+				sinkConnector.write(schema, tableName);
 			}
 		} catch (IOException | SQLException | NotImplementedException e) {
 			throw new RuntimeException(e);
