@@ -8,8 +8,8 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RequiredArgsConstructor
 public class AWSFileReader {
@@ -28,9 +28,7 @@ public class AWSFileReader {
                 .bucket(bucket)
                 .key(objectKey)
                 .build();
-        // TODO: Create just path, so we dont have to delete
-        Path path = Files.createTempFile(objectKey, "");
-        Files.deleteIfExists(path);
+        Path path = Paths.get(System.getProperty("java.io.tmpdir"), "%s_%d".formatted(objectKey, System.currentTimeMillis()));
         s3Client.getObject(request, path);
         return path.toFile();
     }

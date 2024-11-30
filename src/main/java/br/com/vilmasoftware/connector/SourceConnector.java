@@ -5,4 +5,8 @@ import java.sql.SQLException;
 
 public interface SourceConnector {
     SourceConnectionResult write(SourceRequest request) throws IOException, SQLException;
+
+    static SourceConnectorBuilder builder() {
+        return new SourceConnectorBuilder();
+    }
 }

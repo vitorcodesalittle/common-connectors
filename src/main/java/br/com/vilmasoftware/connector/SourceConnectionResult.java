@@ -2,7 +2,6 @@ package br.com.vilmasoftware.connector;
 import lombok.*;
 
 import java.io.File;
-import java.nio.file.Path;
 
 @NoArgsConstructor
 @AllArgsConstructor

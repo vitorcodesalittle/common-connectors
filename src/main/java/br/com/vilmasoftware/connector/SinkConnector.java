@@ -5,4 +5,8 @@ import java.sql.SQLException;
 
 public interface SinkConnector {
     void write(String schema, String table, File file) throws SQLException;
+
+    static SinkConnectorBuilder builder() {
+        return new SinkConnectorBuilder();
+    }
 }
