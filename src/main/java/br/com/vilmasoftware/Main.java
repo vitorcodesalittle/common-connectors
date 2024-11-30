@@ -3,11 +3,11 @@ package br.com.vilmasoftware;
 import br.com.vilmasoftware.connector.SinkConnector;
 import br.com.vilmasoftware.connector.SourceConnectionResult;
 import br.com.vilmasoftware.connector.SourceConnector;
+import br.com.vilmasoftware.connector.SourceRequest;
 import br.com.vilmasoftware.connector.exceptions.NotImplementedException;
 import br.com.vilmasoftware.connector.impl.PgSinkConnector;
 import br.com.vilmasoftware.connector.impl.SourceConnectorImpl;
 import br.com.vilmasoftware.readers.AWSFileReader;
-import br.com.vilmasoftware.writers.AWSCredentials;
 import br.com.vilmasoftware.writers.AWSFileWriter;
 
 import lombok.Getter;
@@ -52,10 +52,9 @@ public class Main {
         try {
             SourceConnector sourceConnector = createSourceConnector(cli.getOptionValue("dataSourceUrl"), cli.getOptionValue("user"), cli.getOptionValue("password"));
             for (String tableName : cli.getOptionValue("tableNames").split(",")) {
-                SourceConnectionResult result = sourceConnector.write(schema, tableName);
+                SourceConnectionResult result = sourceConnector.write(new SourceRequest(schema, tableName));
                 // Upload to s3
                 AWSFileWriter awsFileWriter = new AWSFileWriter(
-                        new AWSCredentials(cli.getOptionValue("awsAccessKeyId"), cli.getOptionValue("awsSecretKey")),
                         cli.getOptionValue("awsS3Bucket"),
                         cli.getOptionValue("awsRegion")
                 );
@@ -87,7 +86,6 @@ public class Main {
 
                 // Upload to s3
                 AWSFileReader awsFileWriter = new AWSFileReader(
-                        new AWSCredentials(cli.getOptionValue("awsAccessKeyId"), cli.getOptionValue("awsSecretKey")),
                         cli.getOptionValue("awsS3Bucket"),
                         cli.getOptionValue("awsRegion")
                 );
@@ -116,8 +114,7 @@ public class Main {
                     switch (DataSourceSupportedProviders.byJdbcId(parts[1])
                             .orElseThrow(() -> notImplemented)) {
                         case POSTGRES -> {
-                            PGSimpleDataSource postgresDataSource = getPostgresDataSource(dataSourceUrl, user, password);
-                            dataSource = postgresDataSource;
+                            dataSource = createPostgresDataSource(dataSourceUrl, user, password);
                             return new PgSinkConnector(dataSource);
                         }
                         case ORACLE -> {
@@ -148,7 +145,7 @@ public class Main {
                     switch (DataSourceSupportedProviders.byJdbcId(parts[0])
                             .orElseThrow(() -> notImplemented)) {
                         case POSTGRES -> {
-                            var dataSource = getPostgresDataSource(dataSourceUrl, user, password);
+                            var dataSource = createPostgresDataSource(dataSourceUrl, user, password);
                             return new SourceConnectorImpl(dataSource);
                         }
                         case ORACLE -> {
@@ -165,7 +162,7 @@ public class Main {
         }
     }
 
-    private static PGSimpleDataSource getPostgresDataSource(String dataSourceUrl, String user, String password) {
+    private static PGSimpleDataSource createPostgresDataSource(String dataSourceUrl, String user, String password) {
         PGSimpleDataSource postgresDataSource = new PGSimpleDataSource();
         postgresDataSource.setURL(dataSourceUrl);
         postgresDataSource.setUser(user);
@@ -174,16 +171,6 @@ public class Main {
     }
 
     public static DataSource createOracleDataSource(String url, String user, String password) throws SQLException {
-        if (url == null || url.isEmpty()) {
-            throw new IllegalArgumentException("URL cannot be null or empty");
-        }
-        if (user == null || user.isEmpty()) {
-            throw new IllegalArgumentException("User cannot be null or empty");
-        }
-        if (password == null) {
-            throw new IllegalArgumentException("Password cannot be null or empty");
-        }
-
         OracleDataSource oracleDataSource = new OracleDataSource();
         oracleDataSource.setURL(url);
         oracleDataSource.setUser(user);
@@ -216,10 +203,7 @@ public class Main {
         options.addOption(Option.builder().longOpt("password").hasArg().desc("").build());
     }
     private static void setAwsOptions(Options options) {
-        options.addOption(Option.builder().longOpt("awsAccessKeyId").hasArg().desc("AWS Access Key ID").build());
-        options.addOption(Option.builder().longOpt("awsSecretKey").hasArg().desc("AWS Secret Key").build());
         options.addOption(Option.builder().longOpt("awsRegion").hasArg().desc("AWS Region").build());
         options.addOption(Option.builder().longOpt("awsS3Bucket").hasArg().desc("Resource where CSV's will be uploaded").build());
-
     }
 }

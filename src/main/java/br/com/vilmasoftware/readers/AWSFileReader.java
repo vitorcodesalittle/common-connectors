@@ -1,9 +1,7 @@
 package br.com.vilmasoftware.readers;
 
-import br.com.vilmasoftware.writers.AWSCredentials;
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -15,7 +13,6 @@ import java.nio.file.Path;
 
 @RequiredArgsConstructor
 public class AWSFileReader {
-    private final AWSCredentials awsCredentials;
     private final String bucket;
     private final String region;
     private S3Client s3Client = null;
@@ -24,7 +21,7 @@ public class AWSFileReader {
         if (s3Client == null) {
             s3Client = S3Client.builder()
                     .region(Region.of(region))
-                    .credentialsProvider(StaticCredentialsProvider.create(credentials()))
+                    .credentialsProvider(DefaultCredentialsProvider.create())
                     .build();
         }
         GetObjectRequest request = GetObjectRequest.builder()
@@ -36,9 +33,5 @@ public class AWSFileReader {
         Files.deleteIfExists(path);
         s3Client.getObject(request, path);
         return path.toFile();
-    }
-    private AwsBasicCredentials credentials() {
-        return AwsBasicCredentials
-                .create(awsCredentials.getAccessKeyId(), awsCredentials.getSecretKey());
     }
 }
