@@ -9,10 +9,11 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 public class SourceConnectorBuilder {
-
     private String dataSourceUrl;
     private String user;
     private String password;
+    private String awsBucketName;
+    private String awsRegionName;
 
     public SourceConnectorBuilder dataSourceUrl(String value) {
         this.dataSourceUrl = value;
@@ -29,6 +30,16 @@ public class SourceConnectorBuilder {
         return this;
     }
 
+    public SourceConnectorBuilder awsRegionName(String value) {
+        awsRegionName = value;
+        return this;
+    }
+
+    public SourceConnectorBuilder awsBucket(String value) {
+        awsBucketName = value;
+        return this;
+    }
+
     public SourceConnector build() throws NotImplementedException {
         if (dataSourceUrl == null || dataSourceUrl.isEmpty()) {
             throw new IllegalArgumentException("Datasource URL cannot be null or empty");
@@ -40,16 +51,16 @@ public class SourceConnectorBuilder {
             if (scheme != null) {
                 String[] parts = scheme.split(":");
                 if (parts.length > 0) {
-                    var notImplemented =  new NotImplementedException("%s is not a supported datasource");
+                    var notImplemented =  new NotImplementedException("%s is not a supported datasource".formatted(parts[0]));
                     switch (DataSourceSupportedProviders.byJdbcId(parts[0])
                             .orElseThrow(() -> notImplemented)) {
                         case POSTGRES -> {
                             var dataSource = DataSourceFactory.createPostgresDataSource(dataSourceUrl, user, password);
-                            return new SourceConnectorImpl(dataSource);
+                            return new SourceConnectorImpl(dataSource, awsBucketName, awsRegionName);
                         }
                         case ORACLE -> {
                             var dataSource = DataSourceFactory.createOracleDataSource(dataSourceUrl, user, password);
-                            return new SourceConnectorImpl(dataSource);
+                            return new SourceConnectorImpl(dataSource, awsBucketName, awsRegionName);
                         }
                     }
 

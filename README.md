@@ -1,25 +1,53 @@
 # Common SQL Connectors
 
-A package for common connectors strategies in java.
+Simple and repeated patterns to synchronize data sources.
 
-I'm not sure if connector qualifies as a design pattern.
-From practical experiences, I've learned people refer to it
-as synchronizing 2 or more data sources.
+## How to run:
 
-Commonly I'm found in a situation where I have to implement
-database synchronization through some form of "dump" from 
-some source connection into a cloud storage, and later
-a "sink" connection would read those dump outputs in order
-to import that.
-Usually I would resort to some sort of open source, battle
-tested solution such as kafka connectors, ...;
+### Oracle Source Connector
 
-But sometimes people would rather not use any additional 
-infrastructure besides their already existing databases
-and cloud storages.
+How to upload Oracle data to S3 in CSV format:
 
-Common SQL Connectors are java implementation from those
-repetitive architectural patterns I found.
+```bash
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+./connectors source \
+  --dataSourceUrl=oracle:thin:.... \
+  --user=SYSADMIN \
+  --password=YOUR_PASSWORD_HERE \
+  --awsS3Bucket=YOUR_TARGET_BUCKET_HERE
+```
+
+### Postgres Sink Connector
+
+How to sink AWS CSV. The command will update the schema as necessary (this can be turned off with `--updateSchema`).
+
+
+```bash
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+./connectors sink \
+  --dataSourceUrl=oracle:thin:.... \
+  --user=YOUR_USER \
+  --password=YOUR_PASSWORD_HERE \
+  --awsS3Bucket=YOUR_TARGET_BUCKET_HERE \
+  --incremental=false \
+  --updateSchema=false
+```
+
+## Schema changes
+
+1. Source adds Column
+
+Then Sink should add the column.
+
+2. Source changes column data type
+
+Then Sink should change the data type if possible.
+
+3. Source removes column
+
+Then Sink should do nothing.
 
 ## Strategies
 

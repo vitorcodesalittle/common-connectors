@@ -5,11 +5,13 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class AWSFileReader {
@@ -17,13 +19,19 @@ public class AWSFileReader {
     private final String region;
     private S3Client s3Client = null;
 
-    public File read(String objectKey) throws IOException {
+
+    private S3Client getS3Client() {
         if (s3Client == null) {
             s3Client = S3Client.builder()
                     .region(Region.of(region))
                     .credentialsProvider(DefaultCredentialsProvider.create())
                     .build();
         }
+        return s3Client;
+    }
+
+    public File read(String objectKey) throws IOException {
+        S3Client s3Client = getS3Client();
         GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(objectKey)
@@ -31,5 +39,15 @@ public class AWSFileReader {
         Path path = Paths.get(System.getProperty("java.io.tmpdir"), "%s_%d".formatted(objectKey, System.currentTimeMillis()));
         s3Client.getObject(request, path);
         return path.toFile();
+    }
+
+    public List<String> listFiles(String bucket, String prefix) {
+        S3Client s3Client = getS3Client();
+        var response = s3Client.listObjects(ListObjectsRequest.builder()
+                .prefix(prefix)
+                .bucket(bucket)
+                .build()
+        );
+        return response.contents().stream().map(obj -> obj.key()).toList();
     }
 }

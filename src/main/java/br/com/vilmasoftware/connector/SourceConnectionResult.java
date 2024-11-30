@@ -1,14 +1,21 @@
 package br.com.vilmasoftware.connector;
 import lombok.*;
 
-import java.io.File;
-
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@ToString
 public class SourceConnectionResult {
     private long rowCount;
-    private File csvTableContent;
-    private File csvTableDataTypeDictionary;
+    private Exception exception;
+
+    public SourceConnectionResult() {}
+
+    public SourceConnectionResult(long rowCount) {
+        this.rowCount = rowCount;
+    }
+
+
+    public SourceConnectionResult(Exception exception) {
+        this.exception = exception;
+    }
 }

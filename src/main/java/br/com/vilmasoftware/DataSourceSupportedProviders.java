@@ -6,7 +6,7 @@ import java.util.Optional;
 
 @Getter
 public enum DataSourceSupportedProviders {
-    POSTGRES("postgres"), ORACLE("oracle");
+    POSTGRES("postgresql"), ORACLE("oracle");
 
     private String jdbcId;
 
