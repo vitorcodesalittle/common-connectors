@@ -2,7 +2,6 @@ package br.com.vilmasoftware.connector.impl;
 
 import br.com.vilmasoftware.connector.*;
 import br.com.vilmasoftware.readers.AWSFileReader;
-import lombok.RequiredArgsConstructor;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
 
@@ -14,15 +13,21 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
-@RequiredArgsConstructor
 public class PgSinkConnector implements SinkConnector {
     private final DataSource dataSource;
     private final String awsBucketName;
     private final String awsRegionName;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
+    private final ExecutorService executorService;
+
+    public PgSinkConnector(DataSource dataSource, String awsBucketName, String awsRegionName, ExecutorService executorService) {
+        assert executorService != null;
+        this.executorService = executorService;
+        this.dataSource = dataSource;
+        this.awsBucketName = awsBucketName;
+        this.awsRegionName = awsRegionName;
+    }
 
     @Override
     public SinkConnectionResult write(SinkRequest request, TableResolver tableResolver) {

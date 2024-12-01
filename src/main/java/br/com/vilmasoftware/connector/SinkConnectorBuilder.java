@@ -6,6 +6,7 @@ import br.com.vilmasoftware.connector.impl.PgSinkConnector;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
 
 public class SinkConnectorBuilder {
 
@@ -14,6 +15,7 @@ public class SinkConnectorBuilder {
     private String password;
     private String awsRegion;
     private String awsBucket;
+    private ExecutorService executorService;
 
     public SinkConnectorBuilder dataSourceUrl(String value) {
         this.dataSourceUrl = value;
@@ -40,6 +42,11 @@ public class SinkConnectorBuilder {
         return this;
     }
 
+    public SinkConnectorBuilder executorService(ExecutorService value) {
+        executorService = value;
+        return this;
+    }
+
     public SinkConnector build() throws NotImplementedException, SQLException {
         if (dataSourceUrl == null || dataSourceUrl.isEmpty()) {
             throw new IllegalArgumentException("Datasource URL cannot be null or empty");
@@ -50,7 +57,7 @@ public class SinkConnectorBuilder {
                 .orElseThrow(() -> notImplemented)) {
             case POSTGRES -> {
                 dataSource = DataSourceFactory.createPostgresDataSource(dataSourceUrl, user, password);
-                return new PgSinkConnector(dataSource, awsBucket, awsRegion);
+                return new PgSinkConnector(dataSource, awsBucket, awsRegion, executorService);
             }
             case ORACLE -> {
                 throw notImplemented;

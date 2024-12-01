@@ -6,6 +6,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +51,6 @@ public class AWSFileReader {
                 .bucket(bucket)
                 .build()
         );
-        return response.contents().stream().map(obj -> obj.key()).toList();
+        return response.contents().stream().map(S3Object::key).toList();
     }
 }

@@ -7,6 +7,8 @@ import br.com.vilmasoftware.connector.impl.SourceConnectorImpl;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SourceConnectorBuilder {
     private String dataSourceUrl;
@@ -14,6 +16,7 @@ public class SourceConnectorBuilder {
     private String password;
     private String awsBucketName;
     private String awsRegionName;
+    private ExecutorService executorService = null;
 
     public SourceConnectorBuilder dataSourceUrl(String value) {
         this.dataSourceUrl = value;
@@ -40,6 +43,11 @@ public class SourceConnectorBuilder {
         return this;
     }
 
+    public SourceConnectorBuilder executorService(ExecutorService value) {
+        executorService = value;
+        return this;
+    }
+
     public SourceConnector build() throws NotImplementedException {
         if (dataSourceUrl == null || dataSourceUrl.isEmpty()) {
             throw new IllegalArgumentException("Datasource URL cannot be null or empty");
@@ -52,15 +60,18 @@ public class SourceConnectorBuilder {
                 String[] parts = scheme.split(":");
                 if (parts.length > 0) {
                     var notImplemented =  new NotImplementedException("%s is not a supported datasource".formatted(parts[0]));
+                    if (executorService == null) {
+                        executorService = Executors.newSingleThreadExecutor();
+                    }
                     switch (DataSourceSupportedProviders.byJdbcId(parts[0])
                             .orElseThrow(() -> notImplemented)) {
                         case POSTGRES -> {
                             var dataSource = DataSourceFactory.createPostgresDataSource(dataSourceUrl, user, password);
-                            return new SourceConnectorImpl(dataSource, awsBucketName, awsRegionName);
+                            return new SourceConnectorImpl(dataSource, awsBucketName, awsRegionName, executorService);
                         }
                         case ORACLE -> {
                             var dataSource = DataSourceFactory.createOracleDataSource(dataSourceUrl, user, password);
-                            return new SourceConnectorImpl(dataSource, awsBucketName, awsRegionName);
+                            return new SourceConnectorImpl(dataSource, awsBucketName, awsRegionName, executorService);
                         }
                     }
 

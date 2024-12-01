@@ -23,19 +23,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 public class SourceConnectorImpl implements SourceConnector {
     protected final DataSource dataSource;
     private final String awsBucketName;
     private final String awsRegionName;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
+    private final ExecutorService executorService;
 
-    public SourceConnectorImpl(DataSource dataSource, String awsBucketName, String awsRegionName) {
+    public SourceConnectorImpl(DataSource dataSource, String awsBucketName, String awsRegionName, ExecutorService executorService) {
         this.dataSource = dataSource;
         this.awsBucketName = awsBucketName;
         this.awsRegionName = awsRegionName;
+        this.executorService = executorService;
     }
 
     public Stream<SourceConnectionResult> write(Stream<SourceRequest> request, TableResolver tableResolver) {
@@ -93,7 +93,7 @@ public class SourceConnectorImpl implements SourceConnector {
                     rowCount++;
                 }
             } catch (SQLException e) {
-                throw new RuntimeException("Failed to write table %s".formatted(tableName), e);
+                return new SourceConnectionResult(e);
             }
         }
         // Upload to s3
