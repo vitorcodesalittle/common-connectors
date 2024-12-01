@@ -8,6 +8,20 @@ Simple and repeated patterns to synchronize data sources.
 
 How to upload Oracle data to S3 in CSV format:
 
+In both examples you need a file containing all query to extract the data.
+Just SourceConnector uses the query, SinkConnector refers to this file to 
+find the external CSV objects.
+
+```json
+[
+  {
+    "query" : "SELECT * FROM hr.d;",
+    "schemaName" : "hr",
+    "tableName" : "d"
+  }
+]
+```
+
 ```bash
 AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...
@@ -15,13 +29,13 @@ AWS_SECRET_ACCESS_KEY=...
   --dataSourceUrl=oracle:thin:.... \
   --user=SYSADMIN \
   --password=YOUR_PASSWORD_HERE \
-  --awsS3Bucket=YOUR_TARGET_BUCKET_HERE
+  --awsS3Bucket=YOUR_TARGET_BUCKET_HERE \
+  --etl-file=./etl-file.json
 ```
 
 ### Postgres Sink Connector
 
-How to sink AWS CSV. The command will update the schema as necessary (this can be turned off with `--updateSchema`).
-
+How to sink AWS CSVs.
 
 ```bash
 AWS_ACCESS_KEY_ID=...
@@ -31,11 +45,34 @@ AWS_SECRET_ACCESS_KEY=...
   --user=YOUR_USER \
   --password=YOUR_PASSWORD_HERE \
   --awsS3Bucket=YOUR_TARGET_BUCKET_HERE \
-  --incremental=false \
-  --updateSchema=false
+  --etl-file=./etl-file.json
 ```
 
-## Schema changes
+## Caveats
+
+### Data Type Caveats
+
+Just simple data types are supported. If data is not int, double, text, timestamps, dates, etc...
+you must cast it to the closer type available.
+
+Example data types not supported:
+- XML
+- Currency
+- Tuples
+
+### Foreign Key Caveats
+
+We don't compute the correct table order for insert respecting FKs. Therefore this
+only works if you're working on tables that are not related to each other.
+This can be addressed in the future.
+
+### Sink Data Source DDL Caveats
+
+We don't automatically try to update the sink data source schema. Therefore, it should
+match the source schema as a requisite.
+This can be addressed in the future.
+
+#### Schema changes
 
 1. Source adds Column
 

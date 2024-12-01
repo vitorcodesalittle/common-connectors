@@ -3,6 +3,7 @@ package br.com.vilmasoftware.connector.impl;
 import br.com.vilmasoftware.connector.SourceConnectionResult;
 import br.com.vilmasoftware.connector.SourceConnector;
 import br.com.vilmasoftware.connector.SourceRequest;
+import br.com.vilmasoftware.connector.TableResolver;
 import br.com.vilmasoftware.writers.AWSFileWriter;
 import br.com.vilmasoftware.writers.CSVLineWriter;
 import lombok.AllArgsConstructor;
@@ -37,10 +38,10 @@ public class SourceConnectorImpl implements SourceConnector {
         this.awsRegionName = awsRegionName;
     }
 
-    public Stream<SourceConnectionResult> write(Stream<SourceRequest> request) {
+    public Stream<SourceConnectionResult> write(Stream<SourceRequest> request, TableResolver tableResolver) {
         return request.map((req) -> executorService.submit(() -> {
                     try {
-                        return write(req);
+                        return write(req, tableResolver);
                     } catch (SQLException | IOException exception) {
                         return new SourceConnectionResult(exception);
                     }
@@ -54,7 +55,7 @@ public class SourceConnectorImpl implements SourceConnector {
                 });
     }
 
-    public SourceConnectionResult write(SourceRequest request) throws IOException, SQLException {
+    public SourceConnectionResult write(SourceRequest request, TableResolver tableResolver) throws IOException, SQLException {
         final long timeId = System.currentTimeMillis();
         final String tableName = "%s.%s".formatted(request.getSchemaName(), request.getTableName());
 
@@ -87,9 +88,6 @@ public class SourceConnectorImpl implements SourceConnector {
                             // Write table content into CSV
                             csvLineWriter2.writeRow(dataTypes);
                         }
-
-                        // Write table content into CSV
-                        csvLineWriter.writeRow(columnNames);
                     }
                     writeRow(myResultSet, csvLineWriter);
                     rowCount++;
@@ -100,8 +98,8 @@ public class SourceConnectorImpl implements SourceConnector {
         }
         // Upload to s3
         final AWSFileWriter awsFileWriter = new AWSFileWriter(awsBucketName, awsRegionName);
-        awsFileWriter.write(dictCsvPath.toFile(), "%s_dict.csv".formatted(tableName));
-        awsFileWriter.write(csvPath.toFile(), "%s.csv".formatted(tableName));
+        awsFileWriter.write(dictCsvPath.toFile(), tableResolver.getDataTypeDictObjectKey(request.getSchemaName(), request.getTableName()));
+        awsFileWriter.write(csvPath.toFile(), tableResolver.getObjectKey(request.getSchemaName(), request.getTableName()));
         Files.delete(dictCsvPath);
         Files.delete(csvPath);
         return new SourceConnectionResult(rowCount);

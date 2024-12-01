@@ -2,6 +2,7 @@ package br.com.vilmasoftware;
 
 import br.com.vilmasoftware.connector.*;
 import br.com.vilmasoftware.connector.exceptions.NotImplementedException;
+import br.com.vilmasoftware.connector.impl.S3SimpleTableResolver;
 import lombok.SneakyThrows;
 
 import org.apache.commons.cli.*;
@@ -10,6 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class Main {
+	private final static TableResolver s3SimpleTableResolver = new S3SimpleTableResolver("data/");
+
 	public static void main(String[] args) {
 		try {
 			CommandLine cli = getCli(args);
@@ -34,18 +37,23 @@ public class Main {
 				.user(cli.getOptionValue("user")).password(cli.getOptionValue("password"))
 				.awsBucket(cli.getOptionValue("awsBucket")).awsRegionName(cli.getOptionValue("awsRegion")).build();
 		try (var sourceStream = SourceRequest.fromFileAsStream(cli.getOptionValue("etl-file"))) {
-			sourceConnector.write(sourceStream);
+			sourceConnector.write(sourceStream, s3SimpleTableResolver);
 		}
 	}
 
 	private static void runSinkConnectorExample(CommandLine cli) {
 		try {
-			// Run Source Connector
-			SinkConnector sinkConnector = SinkConnector.builder().dataSourceUrl(cli.getOptionValue("dataSourceUrl"))
-					.user(cli.getOptionValue("user")).password(cli.getOptionValue("password")).build();
-			final String schema = cli.getOptionValue("schemaName");
-			for (String tableName : cli.getOptionValue("tableNames").split(",")) {
-				sinkConnector.write(schema, tableName);
+			var awsBucket = cli.getOptionValue("awsBucket");
+			// Run Sink Connector
+			SinkConnector sinkConnector = SinkConnector.builder()
+					.dataSourceUrl(cli.getOptionValue("dataSourceUrl"))
+					.user(cli.getOptionValue("user"))
+					.password(cli.getOptionValue("password"))
+					.awsBucket(awsBucket)
+					.awsRegionName(cli.getOptionValue("awsRegion"))
+					.build();
+			try (var sinkStream = SinkRequest.fromFileAsStream(cli.getOptionValue("etl-file"))) {
+				sinkConnector.write(sinkStream, s3SimpleTableResolver);
 			}
 		} catch (IOException | SQLException | NotImplementedException e) {
 			throw new RuntimeException(e);

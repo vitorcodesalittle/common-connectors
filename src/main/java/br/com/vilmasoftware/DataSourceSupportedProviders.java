@@ -16,7 +16,7 @@ public enum DataSourceSupportedProviders {
 
     public static Optional<DataSourceSupportedProviders> byJdbcId(String search) {
         for (DataSourceSupportedProviders d : DataSourceSupportedProviders.values()) {
-            if (d.getJdbcId().equals(search)) return Optional.of(d);
+            if (search.contains(d.getJdbcId())) return Optional.of(d);
         }
         return Optional.empty();
     }

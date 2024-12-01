@@ -22,7 +22,7 @@ public class CSVLineWriter {
         this.nullString = nullString;
     }
 
-    public int writeRow(Object[] row) throws IOException {
+    public void writeRow(Object[] row) throws IOException {
         for (int i = 0; i < row.length; i++) {
             writer.write(parse(row[i]));
             if (i != row.length - 1) {
@@ -30,7 +30,6 @@ public class CSVLineWriter {
             }
         }
         writer.write(rowDelimiter);
-        return delimiter.length() + rowDelimiter.length();
     }
 
     private String parse(Object object) {

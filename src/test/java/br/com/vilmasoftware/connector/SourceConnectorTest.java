@@ -2,6 +2,7 @@ package br.com.vilmasoftware.connector;
 
 import javax.sql.DataSource;
 
+import br.com.vilmasoftware.connector.impl.S3SimpleTableResolver;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -12,23 +13,22 @@ import lombok.SneakyThrows;
 import java.util.concurrent.TimeUnit;
 
 public class SourceConnectorTest {
-    private static DataSource dataSource;
 
     @Test
     @SneakyThrows
     public void testSourceConnectorPostgres() {
         SourceConnector sourceConnector = mockSourceConnector();
-        sourceConnector.write(SourceRequest.fromFileAsStream("./etl.json"))
+        sourceConnector.write(SourceRequest.fromFileAsStream("./etl.json"),
+                        TestConfig.s3SimpleTableResolver)
                 .parallel()
                 .forEach(System.out::println);
-        AWSFileReader reader = new AWSFileReader(awsBucket, awsRegion);
-        System.out.println(reader.listFiles(awsBucket, ""));
+        AWSFileReader reader = new AWSFileReader(TestConfig.awsBucket, TestConfig.awsRegion);
+        System.out.println(reader.listFiles(TestConfig.awsBucket, ""));
     }
 
     @BeforeAll
     @SneakyThrows
     public static void setup() {
-        dataSource = mockDataSource();
         Process p = new ProcessBuilder("./prepare-test.sh")
                 .start();
         p.waitFor(2L, TimeUnit.MINUTES);
@@ -38,27 +38,22 @@ public class SourceConnectorTest {
         }
     }
 
-    private static String dataSourceUrl = "jdbc:postgresql://localhost:5432/Adventureworks";
-    private static String user = "postgres";
-    private static String password= "postgres";
-    private static String awsBucket = "operai-1asd818d3818d3d18";
-    private static String awsRegion = "us-east-1";
 
     @SneakyThrows
     private static SourceConnector mockSourceConnector() {
         return SourceConnector.builder()
-            .dataSourceUrl(dataSourceUrl)
-            .user(user)
-            .password(password)
-            .awsBucket(awsBucket)
-            .awsRegionName(awsRegion)
+            .dataSourceUrl(TestConfig.sourceDataSourceUrl)
+            .user(TestConfig.user)
+            .password(TestConfig.password)
+            .awsBucket(TestConfig.awsBucket)
+            .awsRegionName(TestConfig.awsRegion)
             .build();
     }
     private static DataSource mockDataSource() {
         PGSimpleDataSource ds = new PGSimpleDataSource();
-        ds.setUser(user);
-        ds.setUrl(dataSourceUrl);
-        ds.setPassword(password);
+        ds.setUser(TestConfig.user);
+        ds.setUrl(TestConfig.sourceDataSourceUrl);
+        ds.setPassword(TestConfig.password);
         return ds;
     }
 

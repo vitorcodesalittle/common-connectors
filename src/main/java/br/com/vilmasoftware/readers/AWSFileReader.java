@@ -9,6 +9,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -36,7 +37,8 @@ public class AWSFileReader {
                 .bucket(bucket)
                 .key(objectKey)
                 .build();
-        Path path = Paths.get(System.getProperty("java.io.tmpdir"), "%s_%d".formatted(objectKey, System.currentTimeMillis()));
+        Path path = Paths.get(System.getProperty("java.io.tmpdir"), "%d-%s".formatted(System.currentTimeMillis(), objectKey));
+        Files.createDirectories(path.getParent());
         s3Client.getObject(request, path);
         return path.toFile();
     }
